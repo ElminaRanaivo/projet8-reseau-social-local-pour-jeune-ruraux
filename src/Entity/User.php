@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ApiResource(
@@ -17,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
  */
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -70,7 +72,41 @@ class User
     public function setUsername(string $username): self
     {
         $this->username = $username;
+
         return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     * Needed by UserInterface.
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->username;
+    }
+
+    /**
+     * @deprecated since Symfony 5.3, use getUserIdentifier() instead
+     */
+    public function getSalt(): ?string
+    {
+        // Not needed when using modern algorithms like bcrypt or sodium
+        return null;
+    }
+
+    /**
+     * Returns the roles granted to the user.
+     * Adjust if you want roles.
+     */
+    public function getRoles(): array
+    {
+        // For example, all users have ROLE_USER by default
+        return ['ROLE_USER'];
+    }
+
+    public function eraseCredentials()
+    {
+        // If you store any temporary sensitive data, clear it here
     }
 
     public function getPassword(): ?string
@@ -81,6 +117,7 @@ class User
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
         return $this;
     }
 
