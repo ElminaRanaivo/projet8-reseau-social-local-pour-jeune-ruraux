@@ -3,9 +3,17 @@
 namespace App\Entity;
 
 use App\Repository\PostRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
+ * @ApiResource(
+ *   normalizationContext={"groups"={"post:read"}},
+ *   denormalizationContext={"groups"={"post:write"}}
+ * )
  * @ORM\Entity(repositoryClass=PostRepository::class)
  */
 class Post
@@ -14,33 +22,62 @@ class Post
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"post:read", "user:read", "comment:read"})
      */
     private $id;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"post:read", "post:write", "user:read"})
+     */
+    private $title;
+
+    /**
      * @ORM\Column(type="text")
+     * @Groups({"post:read", "post:write"})
      */
     private $content;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $mediaUrl;
-
-    /**
      * @ORM\Column(type="datetime_immutable")
+     * @Groups({"post:read"})
      */
     private $createdAt;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="posts")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"post:read", "post:write"})
      */
     private $user;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="post", cascade={"remove"})
+     * @Groups({"post:read"})
+     */
+    private $comments;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
     }
 
     public function getContent(): ?string
@@ -55,29 +92,12 @@ class Post
         return $this;
     }
 
-    public function getMediaUrl(): ?string
-    {
-        return $this->mediaUrl;
-    }
-
-    public function setMediaUrl(?string $mediaUrl): self
-    {
-        $this->mediaUrl = $mediaUrl;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
+    // Pas de setter pour createdAt (géré automatiquement)
 
     public function getUser(): ?User
     {
@@ -87,6 +107,35 @@ class Post
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            if ($comment->getPost() === $this) {
+                $comment->setPost(null);
+            }
+        }
 
         return $this;
     }
