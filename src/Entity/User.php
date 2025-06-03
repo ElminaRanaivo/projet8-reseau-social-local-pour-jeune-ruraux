@@ -11,8 +11,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
- *   normalizationContext={"groups"={"user:read"}},
- *   denormalizationContext={"groups"={"user:write"}}
+ *     normalizationContext={"groups"={"user:read"}},
+ *     denormalizationContext={"groups"={"user:write"}}
  * )
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
@@ -34,19 +34,19 @@ class User
     private $username;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", length=255)
      * @Groups({"user:write"})
      */
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity=Post::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Post::class, mappedBy="user", orphanRemoval=true)
      * @Groups({"user:read"})
      */
     private $posts;
 
     /**
-     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="user", orphanRemoval=true)
      * @Groups({"user:read"})
      */
     private $comments;
@@ -70,7 +70,6 @@ class User
     public function setUsername(string $username): self
     {
         $this->username = $username;
-
         return $this;
     }
 
@@ -82,7 +81,6 @@ class User
     public function setPassword(string $password): self
     {
         $this->password = $password;
-
         return $this;
     }
 
@@ -107,7 +105,6 @@ class User
     public function removePost(Post $post): self
     {
         if ($this->posts->removeElement($post)) {
-            // set the owning side to null (unless already changed)
             if ($post->getUser() === $this) {
                 $post->setUser(null);
             }
@@ -137,7 +134,6 @@ class User
     public function removeComment(Comment $comment): self
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
             if ($comment->getUser() === $this) {
                 $comment->setUser(null);
             }

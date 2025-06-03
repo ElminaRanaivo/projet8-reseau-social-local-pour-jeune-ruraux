@@ -3,16 +3,16 @@
 namespace App\Entity;
 
 use App\Repository\PostRepository;
-use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
- *   normalizationContext={"groups"={"post:read"}},
- *   denormalizationContext={"groups"={"post:write"}}
+ *     normalizationContext={"groups"={"post:read"}},
+ *     denormalizationContext={"groups"={"post:write"}}
  * )
  * @ORM\Entity(repositoryClass=PostRepository::class)
  */
@@ -52,15 +52,15 @@ class Post
     private $user;
 
     /**
-     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="post", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="post", orphanRemoval=true)
      * @Groups({"post:read"})
      */
     private $comments;
 
     public function __construct()
     {
-        $this->comments = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -76,7 +76,6 @@ class Post
     public function setTitle(string $title): self
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -88,7 +87,6 @@ class Post
     public function setContent(string $content): self
     {
         $this->content = $content;
-
         return $this;
     }
 
@@ -96,8 +94,6 @@ class Post
     {
         return $this->createdAt;
     }
-
-    // Pas de setter pour createdAt (géré automatiquement)
 
     public function getUser(): ?User
     {
@@ -107,7 +103,6 @@ class Post
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
         return $this;
     }
 
