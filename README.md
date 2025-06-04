@@ -1,18 +1,5 @@
-Elgg Starter Project
-====================
-
-This is a quickstart skeleton for building a site based on Elgg 6.x.
-
 ## Installation
 
-Follow the instructions for [installing Elgg with Composer](http://learn.elgg.org/en/stable/intro/install.html#overview).
-
-## Other versions
-
-If you wish to install a different version of Elgg use the following branches:
-
-- for Elgg v5.x use the branch 5.x
-- for Elgg v4.x use the branch 4.x
-- for Elgg v3.3 use the branch 3.3
-- for Elgg v3.0, v3.1 or v3.2 use the branch 3.0
-- for Elgg v2.3 use the branch 2.x
+- git clone https://github.com/ElminaRanaivo/projet8-reseau-social-local-pour-jeune-ruraux
+- créer la base mysql et importer le fichier sql dans le dossier database
+- mettre ç jour le fichier elgg-config/settings.php
