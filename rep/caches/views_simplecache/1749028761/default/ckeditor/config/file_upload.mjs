@@ -1,0 +1,1 @@
+import elgg from 'elgg';export default{simpleUpload:{uploadUrl:elgg.normalize_url('ckeditor/upload'),}}

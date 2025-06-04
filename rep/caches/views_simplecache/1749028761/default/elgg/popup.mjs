@@ -1,0 +1,13 @@
+import 'jquery';import elgg from 'elgg';import hooks from 'elgg/hooks';import 'jquery-ui';import*as focusTrap from 'focus-trap';let menuTrap;var popup={init:function(){},bind:function($triggers){$triggers.off('click.popup').on('click.popup',function(e){if(e.isDefaultPrevented()){return}
+e.preventDefault();e.stopPropagation();popup.open($(this))})},open:function($trigger,$target,position){if(typeof $trigger==='undefined'||!$trigger.length){return}
+if(typeof $target==='undefined'){var href=$trigger.attr('href')||$trigger.data('href')||'';var targetSelector=elgg.getSelectorFromUrlFragment(href);$target=$(targetSelector)}else{$target.uniqueId();var targetSelector='#'+$target.attr('id')}
+if(!$target.length){return}
+var params={targetSelector:targetSelector,target:$target,source:$trigger};position=position||{my:'center top',at:'center bottom',of:$trigger,collision:'fit fit'};$.extend(position,$trigger.data('position'));position=hooks.trigger('getOptions','ui.popup',params,position);if(!position){return}
+$('[data-popup-trigger-closed]').removeAttr('data-popup-trigger-closed');popup.close();$target.data('trigger',$trigger);$target.data('position',position);if(!$trigger.is('.elgg-popup-inline')){$target.appendTo('body')}
+$target.position(position).fadeIn().addClass('elgg-state-active elgg-state-popped').position(position);$trigger.addClass('elgg-state-active');$target.trigger('open');menuTrap=focusTrap.createFocusTrap(targetSelector,{returnFocusOnDeactivate:!1,initialFocus:function(){if($target.find(':focus').length||$target.is(':focus')){return!1}},clickOutsideDeactivates:function(e){if($trigger.is($(e.target))||($trigger.find($(e.target)).length)){$trigger.attr('data-popup-trigger-closed',!0)}
+return $(e.target).parents('.ui-autocomplete, .ui-datepicker').length===0},allowOutsideClick:!0,onDeactivate:function(){popup.close(undefined,!1)}});menuTrap.activate()},close:function($targets,deactive_menu_trap=!0){if(deactive_menu_trap&&(typeof menuTrap!=='undefined')){menuTrap.deactivate();return}
+if(typeof $targets==='undefined'){$targets=$('.elgg-state-popped')}
+if(!$targets.length){return}
+$targets.each(function(){const $target=$(this);if(!$target.is(':visible')){return}
+const $trigger=$target.data('trigger');if($trigger.length){$trigger.removeClass('elgg-state-active');$trigger.trigger('focus')}
+$target.fadeOut().removeClass('elgg-state-active elgg-state-popped');$target.trigger('close')})}};popup.bind($('.elgg-popup'));export default popup
