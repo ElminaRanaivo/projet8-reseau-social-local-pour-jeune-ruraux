@@ -1,0 +1,5 @@
+import 'jquery';import '../sprintf.js';import elgg from 'elgg';var translations_data=[];export default{reset:function(){translations_data=[]},initLanguage:function(language){language=language||elgg.config.current_language;if(typeof translations_data[language]!=='undefined'){return}
+$.ajax({url:elgg.get_simplecache_url('languages/'+language+'.js'),dataType:'json',async:!1,success:function(translations){translations_data[language]=translations}})},addTranslation:function(lang,translations){if(typeof translations_data[lang]==='undefined'){translations_data[lang]={}}
+$.extend(translations_data[lang],translations)},echo:function(key,argv,language){if(typeof argv==='string'){language=argv;argv=[]}
+this.initLanguage(language);var dlang=elgg.config.current_language;language=language||dlang;argv=argv||[];var map=translations_data[language]||translations_data[dlang];if(map&&(typeof map[key]==='string')){return vsprintf(map[key],argv)}
+return key}}

@@ -1,0 +1,2 @@
+import 'jquery';function toggle(event){event.preventDefault();var $this=$(this);var selector=$this.data().toggleSelector;if(!selector){selector=$this.attr('href')}
+var $elements=$(selector);$this.toggleClass('elgg-state-active');$elements.each(function(index,elem){var $elem=$(elem);if($elem.data().toggleSlide!=!1){$elem.slideToggle('medium')}else{$elem.toggle()}});$this.trigger('elgg_ui_toggle',[{$toggled_elements:$elements}])};$(document).on('click','.elgg-toggle',toggle)
